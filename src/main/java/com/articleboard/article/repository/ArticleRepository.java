@@ -20,4 +20,6 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
     Page<Article> findByWriterContaining(String writer, Pageable pageable);
 
     Page<Article> findByLikeCountGreaterThanEqual(Long likeCount, Pageable pageable);
+
+    Page<Article> findByUser_UserNo(Long userNo, Pageable pageable);
 }
