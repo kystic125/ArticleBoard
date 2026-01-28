@@ -34,7 +34,7 @@ public class Article {
     private Long viewCount = 0L;
 
     @Column(nullable = false)
-    private boolean isNotice = false;
+    private Boolean isNotice = false;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
