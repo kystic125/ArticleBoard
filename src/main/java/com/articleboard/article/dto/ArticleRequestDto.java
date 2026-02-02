@@ -2,10 +2,11 @@ package com.articleboard.article.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
+@AllArgsConstructor
 public class ArticleRequestDto {
 
     @NotBlank
@@ -16,12 +17,5 @@ public class ArticleRequestDto {
     @Size(max = 5000)
     private final String content;
 
-    private final boolean isNotice;
-
-    @Builder
-    public ArticleRequestDto(String title, String content, boolean isNotice) {
-        this.title = title;
-        this.content = content;
-        this.isNotice = isNotice;
-    }
+    private final Boolean isNotice;
 }
