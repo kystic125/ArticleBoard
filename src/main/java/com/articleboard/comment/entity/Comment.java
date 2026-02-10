@@ -1,6 +1,7 @@
 package com.articleboard.comment.entity;
 
 import com.articleboard.article.entity.Article;
+import com.articleboard.global.exception.CustomException;
 import com.articleboard.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -49,12 +50,29 @@ public class Comment {
         this.createdAt = LocalDateTime.now();
     }
 
-    public void update(String content) {
+    public static Comment createComment(String content, Article article, User user) {
+        return new Comment(
+                user.getDisplayName(),
+                content,
+                user,
+                article,
+                null
+        );
+    }
+
+    public void update(String content, User user) {
+        validateOwner(user);
         this.content = content;
     }
 
     public void delete() {
         this.isDeleted = true;
 
+    }
+
+    public void validateOwner(User user) {
+        if (!this.user.getUserId().equals(user.getUserId())) {
+            throw new CustomException("권한 없음");
+        }
     }
 }

@@ -78,4 +78,8 @@ public class User {
             this.fixedName = null;
         }
     }
+
+    public String getDisplayName() {
+        return nicknameType == NicknameType.FIXED ? fixedName : temporaryName;
+    }
 }

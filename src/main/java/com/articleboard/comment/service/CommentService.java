@@ -6,7 +6,6 @@ import com.articleboard.comment.dto.CommentResponseDto;
 import com.articleboard.comment.entity.Comment;
 import com.articleboard.comment.repository.CommentRepository;
 import com.articleboard.global.exception.CustomException;
-import com.articleboard.user.entity.NicknameType;
 import com.articleboard.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -16,49 +15,26 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class CommentService {
 
     private final CommentRepository commentRepository;
 
-
+    @Transactional
     public void createComment(CommentRequestDto dto, Article article, User user) {
-        String nickname = user.getNicknameType() == NicknameType.FIXED
-                ? user.getFixedName()
-                : user.getTemporaryName();
-
-        Comment comment = new Comment(
-                nickname,
-                dto.getContent(),
-                user,
-                article,
-                null
-        );
-
-        commentRepository.save(comment);
+        commentRepository.save(Comment.createComment(dto.getContent(), article, user));
     }
 
     @Transactional
     public void updateComment(Long commentId, CommentRequestDto dto, User user) {
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new CustomException("댓글 없음"));
-
-        if (!comment.getUser().getUserId().equals(user.getUserId())) {
-            throw new CustomException("권한 없음");
-        }
-
-        comment.update(
-                dto.getContent()
-        );
+        Comment comment = findComment(commentId);
+        comment.update(dto.getContent(), user);
     }
 
     @Transactional
     public void deleteComment(Long commentId, User user) {
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new CustomException("댓글 없음"));
-
-        if (!comment.getUser().getUserId().equals(user.getUserId())) {
-            throw new CustomException("권한 없음");
-        }
+        Comment comment = findComment(commentId);
+        comment.validateOwner(user);
 
         if (comment.getParent() == null && commentRepository.existsByParent(commentId)) {
             comment.delete();
@@ -67,9 +43,13 @@ public class CommentService {
         }
     }
 
-    @Transactional(readOnly = true)
     public Page<CommentResponseDto> getCommentList(Long articleId, Pageable pageable) {
         return commentRepository.findByArticle_ArticleId(articleId, pageable)
                 .map(CommentResponseDto::from);
+    }
+
+    private Comment findComment(Long commentId) {
+        return commentRepository.findById(commentId)
+                .orElseThrow(() -> new CustomException("댓글 없음"));
     }
 }
