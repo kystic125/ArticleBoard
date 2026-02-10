@@ -7,6 +7,7 @@ import com.articleboard.article.entity.Article;
 import com.articleboard.article.repository.ArticleRepository;
 import com.articleboard.global.exception.CustomException;
 import com.articleboard.user.entity.User;
+import com.articleboard.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ArticleService {
 
     private final ArticleRepository articleRepository;
-
+    /*
     @Transactional
     public Long createArticle(ArticleRequestDto dto, User user) {
         Article article = Article.createArticle(dto.getTitle(), dto.getContent(), dto.getIsNotice(), user);
@@ -39,7 +40,40 @@ public class ArticleService {
         article.validateOwner(user);
         articleRepository.deleteById(articleId);
     }
+     */
 
+    // TODO: 로그인 구현 후 User user로 변경, findUser() 및 UserRepository 제거
+    private final UserRepository userRepository;  // 추가 (추후 로그인 구현 시 제거)
+
+    @Transactional
+    public Long createArticle(ArticleRequestDto dto, Long userId) {
+        User user = findUser(userId);
+        Article article = Article.createArticle(dto.getTitle(), dto.getContent(), dto.getIsNotice(), user);
+        return articleRepository.save(article).getArticleId();
+    }
+
+    @Transactional
+    public void updateArticle(Long articleId, ArticleRequestDto dto, Long userId) {
+        Article article = findArticle(articleId);
+        User user = findUser(userId);
+        article.validateOwner(user);
+        article.update(dto.getTitle(), dto.getContent(), dto.getIsNotice());
+    }
+
+    @Transactional
+    public void deleteArticle(Long articleId, Long userId) {
+        Article article = findArticle(articleId);
+        User user = findUser(userId);
+        article.validateOwner(user);
+        articleRepository.deleteById(articleId);
+    }
+
+    private User findUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException("유저 없음"));
+    }
+    // TODO: 여기까지 테스트를 위해 추가한 부분
+    
     @Transactional
     public ArticleResponseDto getArticle(Long articleId) {
         Article article = findArticle(articleId);
