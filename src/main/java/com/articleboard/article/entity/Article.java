@@ -1,5 +1,6 @@
 package com.articleboard.article.entity;
 
+import com.articleboard.global.exception.CustomException;
 import com.articleboard.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -65,6 +66,9 @@ public class Article {
         this.createdAt = LocalDateTime.now();
     }
 
+    public static Article createArticle(String title, String content, Boolean isNotice, User user) {
+        return new Article(title, content, user.getDisplayName(), isNotice, user);
+    }
     public void update(String title, String content, boolean isNotice) {
         this.title = title;
         this.content = content;
@@ -74,5 +78,11 @@ public class Article {
 
     public void increaseViewCount() {
         this.viewCount += 1;
+    }
+
+    public void validateOwner(User user) {
+        if (!this.user.getUserId().equals(user.getUserId())) {
+            throw new CustomException("권한 없음");
+        }
     }
 }
