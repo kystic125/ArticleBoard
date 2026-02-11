@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class CommentResponseDto {
 
-    private final Long id;
+    private final Long commentId;
     private final String content;
     private final String writer;
     private final Long userId;
@@ -20,11 +20,11 @@ public class CommentResponseDto {
 
     public static CommentResponseDto from(Comment comment) {
         return new CommentResponseDto(
-                comment.getId(),
+                comment.getCommentId(),
                 comment.getContent(),
                 comment.getWriter(),
                 comment.getUser().getUserId(),
-                comment.getParent(),
+                comment.getParentId(),
                 comment.getCreatedAt(),
                 comment.getIsDeleted()
         );

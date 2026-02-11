@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ArticleResponseDto {
 
-    private final Long id;
+    private final Long articleId;
     private final String title;
     private final String content;
     private final String writer;

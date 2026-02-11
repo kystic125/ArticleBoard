@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 public class Comment {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long CommentId;
 
     @Column(nullable = false, length = 10)
     private String writer;
@@ -29,7 +29,8 @@ public class Comment {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    private Long parent;
+    @Column(name = "parent_id")
+    private Long parentId;
 
     private Boolean isDeleted = false;
 
@@ -41,12 +42,12 @@ public class Comment {
     @JoinColumn(name = "article_id", nullable = false)
     private Article article;
 
-    public Comment(String writer, String content, User user, Article article, Long parent) {
+    public Comment(String writer, String content, User user, Article article, Long parentId) {
         this.writer = writer;
         this.content = content;
         this.user = user;
         this.article = article;
-        this.parent = parent;
+        this.parentId = parentId;
         this.createdAt = LocalDateTime.now();
     }
 

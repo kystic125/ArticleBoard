@@ -9,9 +9,9 @@ public class CommentDislike {
     @EmbeddedId
     private CommentDislikeId id;
 
-    @MapsId("id")
+    @MapsId("commentId")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "comment_id")
     private Comment comment;
 
     @MapsId("userId")

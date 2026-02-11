@@ -11,7 +11,7 @@ public class ArticleLike implements Serializable {
     @EmbeddedId
     private ArticleLikeId id;
 
-    @MapsId("articleIo")
+    @MapsId("articleId")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "article_id")
     private Article article;

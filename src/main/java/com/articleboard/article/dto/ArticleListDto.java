@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ArticleListDto {
 
-    private final Long id;
+    private final Long articleId;
     private final Boolean isNotice;
     private final String title;
     private final String writer;
