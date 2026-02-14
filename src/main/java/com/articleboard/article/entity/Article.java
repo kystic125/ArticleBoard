@@ -69,11 +69,17 @@ public class Article {
     public static Article createArticle(String title, String content, Boolean isNotice, User user) {
         return new Article(title, content, user.getDisplayName(), isNotice, user);
     }
-    public void update(String title, String content, boolean isNotice) {
+
+    public void updateArticle(String title, String content, boolean isNotice) {
         this.title = title;
         this.content = content;
         this.isNotice = isNotice;
         this.updatedAt = LocalDateTime.now();
+    }
+
+    public void deleteArticle(User user) {
+        validateOwner(user);
+        this.deletedAt = LocalDateTime.now();
     }
 
     public void increaseViewCount() {

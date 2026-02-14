@@ -57,15 +57,14 @@ public class ArticleService {
         Article article = findArticle(articleId);
         User user = findUser(userId);
         article.validateOwner(user);
-        article.update(dto.getTitle(), dto.getContent(), dto.getIsNotice());
+        article.updateArticle(dto.getTitle(), dto.getContent(), dto.getIsNotice());
     }
 
     @Transactional
     public void deleteArticle(Long articleId, Long userId) {
         Article article = findArticle(articleId);
         User user = findUser(userId);
-        article.validateOwner(user);
-        articleRepository.deleteById(articleId);
+        article.deleteArticle(user);
     }
 
     private User findUser(Long userId) {
@@ -73,7 +72,7 @@ public class ArticleService {
                 .orElseThrow(() -> new CustomException("유저 없음"));
     }
     // TODO: 여기까지 테스트를 위해 추가한 부분
-    
+
     @Transactional
     public ArticleResponseDto getArticle(Long articleId) {
         Article article = findArticle(articleId);
