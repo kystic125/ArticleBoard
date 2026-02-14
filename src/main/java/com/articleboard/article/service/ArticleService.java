@@ -147,4 +147,9 @@ public class ArticleService {
                         }
                 );
     }
+
+    public Page<ArticleListDto> getPopularArticles(Long minLikeCount, Long maxDislikeCount, Pageable pageable) {
+        return articleRepository.findPopularArticles(minLikeCount, maxDislikeCount, pageable)
+                .map(ArticleListDto::from);
+    }
 }

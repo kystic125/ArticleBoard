@@ -17,6 +17,7 @@ public class ArticleListDto {
     private final LocalDateTime updatedAt;
     private final Long viewCount;
     private final Long likeCount;
+    private final long dislikeCount;
 
     public static ArticleListDto from(Article article) {
         return new ArticleListDto(
@@ -26,7 +27,8 @@ public class ArticleListDto {
                 article.getWriter(),
                 article.getUpdatedAt(),
                 article.getViewCount(),
-                article.getLikeCount()
+                article.getLikeCount(),
+                article.getDislikeCount()
         );
     }
 }

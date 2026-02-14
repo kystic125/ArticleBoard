@@ -43,6 +43,7 @@ public class ArticleController {
 
         return ResponseEntity.ok().build();
     }
+
     @GetMapping("/{articleId}")
     public ResponseEntity<ArticleResponseDto> get(@PathVariable Long articleId) {
         return ResponseEntity.ok(articleService.getArticle(articleId));
@@ -65,5 +66,11 @@ public class ArticleController {
             default -> throw new CustomException("잘못된 검색 타입");
         };
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/popular")
+    public ResponseEntity<Page<ArticleListDto>> getPopularArticles(@RequestParam(defaultValue = "10") Long minLike,
+                                                                   @RequestParam(defaultValue = "15") Long maxDislike, Pageable pageable) {
+        return ResponseEntity.ok(articleService.getPopularArticles(minLike, maxDislike, pageable));
     }
 }
