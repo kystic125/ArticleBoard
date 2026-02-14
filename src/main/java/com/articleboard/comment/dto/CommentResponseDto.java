@@ -14,7 +14,8 @@ public class CommentResponseDto {
     private final String content;
     private final String writer;
     private final Long userId;
-    private final Long parent;
+    private final Long rootId;
+    private final Long parentId;
     private final LocalDateTime createdAt;
     private final Boolean isDeleted;
 
@@ -24,6 +25,7 @@ public class CommentResponseDto {
                 comment.getContent(),
                 comment.getWriter(),
                 comment.getUser().getUserId(),
+                comment.getRootId(),
                 comment.getParentId(),
                 comment.getCreatedAt(),
                 comment.getIsDeleted()
