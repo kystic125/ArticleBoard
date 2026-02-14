@@ -99,6 +99,11 @@ public class ArticleService {
                 .map(ArticleListDto::from);
     }
 
+    public Page<ArticleListDto> searchByContent(String keyword, Pageable pageable) {
+        return articleRepository.findByContentContaining(keyword, pageable)
+                .map(ArticleListDto::from);
+    }
+
     public Page<ArticleListDto> searchByWriter(String keyword, Pageable pageable) {
         return articleRepository.findByWriterContaining(keyword, pageable)
                 .map(ArticleListDto::from);

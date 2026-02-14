@@ -60,6 +60,7 @@ public class ArticleController {
         Page<ArticleListDto> result = switch (type) {
             case "title" -> articleService.searchByTitle(keyword, pageable);
             case "title-content" -> articleService.searchByTitleOrContent(keyword, pageable);
+            case "content" -> articleService.searchByContent(keyword, pageable);
             case "writer" -> articleService.searchByWriter(keyword, pageable);
             default -> throw new CustomException("잘못된 검색 타입");
         };
