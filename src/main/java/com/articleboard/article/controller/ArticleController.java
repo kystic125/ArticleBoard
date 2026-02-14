@@ -73,4 +73,9 @@ public class ArticleController {
                                                                    @RequestParam(defaultValue = "15") Long maxDislike, Pageable pageable) {
         return ResponseEntity.ok(articleService.getPopularArticles(minLike, maxDislike, pageable));
     }
+
+    @GetMapping("/notice")
+    public ResponseEntity<Page<ArticleListDto>> getNoticeArticles(Pageable pageable) {
+        return ResponseEntity.ok(articleService.getNoticeArticles(pageable));
+    }
 }

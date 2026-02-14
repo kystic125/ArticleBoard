@@ -152,4 +152,9 @@ public class ArticleService {
         return articleRepository.findPopularArticles(minLikeCount, maxDislikeCount, pageable)
                 .map(ArticleListDto::from);
     }
+
+    public Page<ArticleListDto> getNoticeArticles(Pageable pageable) {
+        return articleRepository.findByIsNotice(true, pageable)
+                .map(ArticleListDto::from);
+    }
 }
