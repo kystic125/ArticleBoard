@@ -3,9 +3,7 @@ package com.articleboard.article.service;
 import com.articleboard.article.dto.ArticleListDto;
 import com.articleboard.article.dto.ArticleRequestDto;
 import com.articleboard.article.dto.ArticleResponseDto;
-import com.articleboard.article.entity.*;
-import com.articleboard.article.repository.ArticleDislikeRepository;
-import com.articleboard.article.repository.ArticleLikeRepository;
+import com.articleboard.article.entity.Article;
 import com.articleboard.article.repository.ArticleRepository;
 import com.articleboard.global.exception.CustomException;
 import com.articleboard.user.entity.User;
@@ -22,8 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class ArticleService {
 
     private final ArticleRepository articleRepository;
-    private final ArticleLikeRepository articleLikeRepository;
-    private final ArticleDislikeRepository articleDislikeRepository;
     private final UserService userService;
 
     @Transactional
@@ -35,7 +31,7 @@ public class ArticleService {
 
     @Transactional
     public void updateArticle(Long articleId, ArticleRequestDto dto, Long userId) {
-        Article article = findArticle(articleId);
+        Article article = findById(articleId);
         User user = userService.findById(userId);
         article.validateOwner(user);
         article.updateArticle(dto.getTitle(), dto.getContent(), dto.getIsNotice());
@@ -43,14 +39,14 @@ public class ArticleService {
 
     @Transactional
     public void deleteArticle(Long articleId, Long userId) {
-        Article article = findArticle(articleId);
+        Article article = findById(articleId);
         User user = userService.findById(userId);
         article.deleteArticle(user);
     }
 
     @Transactional
     public ArticleResponseDto getArticle(Long articleId) {
-        Article article = findArticle(articleId);
+        Article article = findById(articleId);
         article.increaseViewCount();
         return ArticleResponseDto.from(article);
     }
@@ -80,45 +76,6 @@ public class ArticleService {
                 .map(ArticleListDto::from);
     }
 
-    private Article findArticle(Long articleId) {
-        return articleRepository.findById(articleId)
-                .orElseThrow(() -> new CustomException("게시글 없음"));
-    }
-
-    public void toggleLike(Long articleId, Long userId) {
-        Article article = findArticle(articleId);
-        User user = userService.findById(userId);
-
-        articleLikeRepository.findById(ArticleLikeId.of(articleId, userId))
-                .ifPresentOrElse(
-                        like -> {
-                            articleLikeRepository.delete(like);
-                            article.decreaseLikeCount();
-                        },
-                        () -> {
-                            articleLikeRepository.save(ArticleLike.createArticleLike(article, user));
-                            article.increaseLikeCount();
-                        }
-                );
-    }
-
-    public void toggleDislike(Long articleId, Long userId) {
-        Article article = findArticle(articleId);
-        User user = userService.findById(userId);
-
-        articleDislikeRepository.findById(ArticleDislikeId.of(articleId, userId))
-                .ifPresentOrElse(
-                        dislike -> {
-                            articleDislikeRepository.delete(dislike);
-                            article.decreaseDislikeCount();
-                        },
-                        () -> {
-                            articleDislikeRepository.save(ArticleDislike.createArticleDislike(article, user));
-                            article.increaseDislikeCount();
-                        }
-                );
-    }
-
     public Page<ArticleListDto> getPopularArticles(Long minLikeCount, Long maxDislikeCount, Pageable pageable) {
         return articleRepository.findPopularArticles(minLikeCount, maxDislikeCount, pageable)
                 .map(ArticleListDto::from);
@@ -127,5 +84,10 @@ public class ArticleService {
     public Page<ArticleListDto> getNoticeArticles(Pageable pageable) {
         return articleRepository.findByIsNotice(true, pageable)
                 .map(ArticleListDto::from);
+    }
+
+    public Article findById(Long articleId) {
+        return articleRepository.findById(articleId)
+                .orElseThrow(() -> new CustomException("게시글 없음"));
     }
 }
