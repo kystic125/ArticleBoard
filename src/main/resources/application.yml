@@ -1,27 +1,10 @@
-#spring:
-#  config:
-#    import: optional:file:.env[.properties]
-#  datasource:
-#    driver-class-name: com.mysql.cj.jdbc.Driver
-#    url: jdbc:mysql://localhost:3306/board_db?useSSL=false&serverTimezone=Asia/Seoul
-#    username: ${DB_USERNAME}
-#    password: ${DB_PASSWORD}
-#  jpa:
-#    database-platform: org.hibernate.dialect.MySQLDialect
-#    hibernate:
-#      ddl-auto: update
-#    show-sql: true
-#    properties:
-#      hibernate:
-#        format_sql: true
-
 # TODO: #: DB에 임시 데이터를 넣기 위한 설정, 필요없어지면 위 주석부분 사용
 spring:
   config:
     import: optional:file:.env[.properties]
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/board_db?useSSL=false&serverTimezone=Asia/Seoul
+    url: jdbc:mysql://localhost:3306/board_db?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=Asia/Seoul
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
   sql: # 추가
