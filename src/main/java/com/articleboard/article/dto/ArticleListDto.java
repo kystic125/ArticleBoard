@@ -17,7 +17,7 @@ public class ArticleListDto {
     private final LocalDateTime updatedAt;
     private final Long viewCount;
     private final Long likeCount;
-    private final long dislikeCount;
+    private final Long dislikeCount;
 
     public static ArticleListDto from(Article article) {
         return new ArticleListDto(
