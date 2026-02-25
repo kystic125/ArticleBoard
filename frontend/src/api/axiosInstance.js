@@ -1,0 +1,29 @@
+import axios from 'axios'
+
+const axiosInstance = axios.create({
+  baseURL: '/',
+  headers: { 'Content-Type': 'application/json' },
+})
+
+axiosInstance.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token')
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+  return config
+})
+
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const isLoginRequest = error.config?.url?.includes('/api/auth/login')
+    if (error.response?.status === 401 && !isLoginRequest) {
+      localStorage.removeItem('token')
+      localStorage.removeItem('userId')
+      window.location.href = '/login'
+    }
+    return Promise.reject(error)
+  }
+)
+
+export default axiosInstance
