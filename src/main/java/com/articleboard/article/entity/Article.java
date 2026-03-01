@@ -60,6 +60,10 @@ public class Article {
     @Column(nullable = false)
     private Boolean isPopular = false;
 
+    @Column(nullable = false)
+    private Boolean isPopularBlocked = false;
+
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -102,7 +106,7 @@ public class Article {
 
     public void increaseLikeCount() {
         this.likeCount += 1;
-        if (this.likeCount >= 10) {
+        if (this.likeCount >= 10 && !this.isPopularBlocked) {
             this.isPopular = true;
         }
     }
@@ -133,5 +137,6 @@ public class Article {
 
     public void resetPopular() {
         this.isPopular = false;
+        this.isPopularBlocked = true;
     }
 }
