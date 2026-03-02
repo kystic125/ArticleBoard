@@ -23,6 +23,7 @@ public class ArticleResponseDto {
     private final Long commentCount;
     private final Long userId;
     private final Boolean isPopular;
+    private final Boolean isPopularBlocked;
 
     public static ArticleResponseDto from(Article article) {
         return new ArticleResponseDto(
@@ -38,7 +39,8 @@ public class ArticleResponseDto {
                 article.getDislikeCount(),
                 article.getCommentCount(),
                 article.getUser().getUserId(),
-                article.getIsPopular()
+                article.getIsPopular(),
+                article.getIsPopularBlocked()
         );
     }
 }

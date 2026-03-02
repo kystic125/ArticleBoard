@@ -19,6 +19,7 @@ public class ArticleListDto {
     private final Long viewCount;
     private final Long likeCount;
     private final Long dislikeCount;
+    private final Boolean isPopularBlocked;
 
     public static ArticleListDto from(Article article) {
         return new ArticleListDto(
@@ -30,7 +31,8 @@ public class ArticleListDto {
                 article.getCreatedAt(),
                 article.getViewCount(),
                 article.getLikeCount(),
-                article.getDislikeCount()
+                article.getDislikeCount(),
+                article.getIsPopularBlocked()
         );
     }
 }

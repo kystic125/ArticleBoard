@@ -106,7 +106,8 @@ public class Article {
 
     public void increaseLikeCount() {
         this.likeCount += 1;
-        if (this.likeCount >= 10 && !this.isPopularBlocked) {
+//        if (this.likeCount >= 10 && !this.isPopularBlocked) {
+        if (this.likeCount >= 3 && !this.isPopularBlocked) { // 테스트 용으로 추천수 3개로 변경
             this.isPopular = true;
         }
     }
@@ -136,7 +137,10 @@ public class Article {
     }
 
     public void resetPopular() {
-        this.isPopular = false;
         this.isPopularBlocked = true;
+    }
+
+    public void restorePopular() {
+        this.isPopularBlocked = false;
     }
 }

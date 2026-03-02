@@ -30,6 +30,9 @@ export const bumpArticle = (id) =>
 export const resetPopular = (id) =>
   axiosInstance.patch(`/api/articles/${id}/unpopular`)
 
+export const restorePopular = (id) =>
+  axiosInstance.patch(`/api/articles/${id}/popular`)
+
 export const adminDeleteArticle = (id) =>
   axiosInstance.delete(`/api/articles/${id}/admin`)
 

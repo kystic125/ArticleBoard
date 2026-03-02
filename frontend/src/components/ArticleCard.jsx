@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 
 export default function ArticleCard({ article }) {
-  const { articleId, title, writer, createdAt, viewCount, likeCount, dislikeCount, isNotice, isPopular } = article
+  const { articleId, title, writer, createdAt, viewCount, likeCount, dislikeCount, isNotice, isPopular, isPopularBlocked } = article
 
   const formatDate = (dateStr) => {
     if (!dateStr) return ''
@@ -12,7 +12,7 @@ export default function ArticleCard({ article }) {
     <div style={styles.card}>
       <div style={styles.main}>
         {isNotice && <span style={styles.noticeBadge}>공지</span>}
-        {isPopular && <span style={styles.popularBadge}>인기</span>}
+        {isPopular && !isPopularBlocked && <span style={styles.popularBadge}>인기</span>}
         <Link to={`/articles/${articleId}`} style={styles.title}>{title}</Link>
       </div>
       <div style={styles.meta}>

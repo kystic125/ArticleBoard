@@ -93,10 +93,16 @@ public class ArticleController {
         articleService.bump(articleId);
         return ResponseEntity.ok().build();
     }
-    
+
     @PatchMapping("/{articleId}/unpopular")
     public ResponseEntity<Void> resetPopular(@PathVariable Long articleId) {
         articleService.resetPopular(articleId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{articleId}/popular")
+    public ResponseEntity<Void> restorePopular(@PathVariable Long articleId) {
+        articleService.restorePopular(articleId);
         return ResponseEntity.ok().build();
     }
 }

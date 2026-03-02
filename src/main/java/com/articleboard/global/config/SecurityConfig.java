@@ -46,6 +46,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/articles/*/admin", "/api/articles/*/notice", "/api/articles/*/bump")
                         .hasAuthority("MANAGER")
                         .requestMatchers(HttpMethod.PATCH, "/api/articles/*/unpopular").hasAuthority("MANAGER")
+                        .requestMatchers(HttpMethod.PATCH, "/api/articles/*/popular").hasAuthority("MANAGER")
                         .requestMatchers("/admin/**").hasRole("MANAGER")
                         .anyRequest().authenticated()
                 )

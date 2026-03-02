@@ -121,4 +121,9 @@ public class ArticleService {
     public void resetPopular(Long articleId) {
         findById(articleId).resetPopular();
     }
+
+    @Transactional
+    public void restorePopular(Long articleId) {
+        findById(articleId).restorePopular();
+    }
 }

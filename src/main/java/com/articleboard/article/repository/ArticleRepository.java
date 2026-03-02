@@ -26,7 +26,7 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
 
     Page<Article> findByUser_UserId(Long userId, Pageable pageable);
 
-    @Query("SELECT a FROM Article a WHERE a.likeCount >= :minLike AND a.dislikeCount <= :minDislike")
+    @Query("SELECT a FROM Article a WHERE a.isPopular = true AND a.isPopularBlocked = false AND a.likeCount >= :minLike AND a.dislikeCount <= :minDislike")
     Page<Article> findPopularArticles(@Param("minLike") Long minLike, @Param("minDislike") Long maxDislike, Pageable pageable);
 
     @Modifying
