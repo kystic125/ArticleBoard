@@ -3,12 +3,9 @@ package com.articleboard.auth.service;
 import com.articleboard.auth.dto.AuthResponseDto;
 import com.articleboard.auth.dto.LoginRequestDto;
 import com.articleboard.auth.entity.RefreshToken;
-import com.articleboard.global.exception.CustomException;
-import com.articleboard.global.exception.ErrorCode;
 import com.articleboard.global.security.CustomUserDetails;
 import com.articleboard.global.security.JwtUtil;
 import com.articleboard.user.entity.User;
-import com.articleboard.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,7 +20,6 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
     private final RefreshTokenService refreshTokenService;
-    private final UserRepository userRepository;
 
     @Transactional
     public AuthResponseDto login(LoginRequestDto request) {
@@ -38,20 +34,18 @@ public class AuthService {
                 user.getRole().name(),
                 user.getUserId()
         );
-        RefreshToken refreshToken = refreshTokenService.create(user.getUserId());
+        RefreshToken refreshToken = refreshTokenService.create(user.getUserId(), user.getUserName(), user.getRole().name());
         return new AuthResponseDto(accessToken, refreshToken.getToken());
     }
 
     @Transactional
     public AuthResponseDto refresh(String refreshTokenValue) {
         RefreshToken oldRefreshToken = refreshTokenService.validate(refreshTokenValue);
-        User user = userRepository.findById(oldRefreshToken.getUserId())
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         String newAccessToken = jwtUtil.generateToken(
-                user.getUserName(),
-                user.getRole().name(),
-                user.getUserId()
+                oldRefreshToken.getUsername(),
+                oldRefreshToken.getRole(),
+                oldRefreshToken.getUserId()
         );
         RefreshToken newRefreshToken = refreshTokenService.rotate(oldRefreshToken);
         return new AuthResponseDto(newAccessToken, newRefreshToken.getToken());

@@ -20,11 +20,12 @@ public class RefreshTokenService {
     private long refreshExpiration;
 
     @Transactional
-    public RefreshToken create(Long userId) {
-        RefreshToken refreshToken = RefreshToken.create(userId, refreshExpiration);
+    public RefreshToken create(Long userId, String username, String role) {
+        RefreshToken refreshToken = RefreshToken.create(userId, username, role, refreshExpiration);
         return refreshTokenRepository.save(refreshToken);
     }
 
+    @Transactional
     public RefreshToken validate(String token) {
         RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
                 .orElseThrow(() -> new CustomException(ErrorCode.REFRESH_TOKEN_NOT_FOUND));
@@ -39,7 +40,7 @@ public class RefreshTokenService {
     @Transactional
     public RefreshToken rotate(RefreshToken oldToken) {
         refreshTokenRepository.delete(oldToken);
-        return create(oldToken.getUserId());
+        return create(oldToken.getUserId(), oldToken.getUsername(), oldToken.getRole());
     }
 
     @Transactional

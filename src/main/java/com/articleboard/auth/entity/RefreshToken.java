@@ -23,21 +23,29 @@ public class RefreshToken {
     @Column(nullable = false)
     private Long userId;
 
+    @Column(nullable = false)
+    private String username;
+
+    @Column(nullable = false)
+    private String role;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @Column(nullable = false)
     private LocalDateTime expiresAt;
 
-    public RefreshToken(Long userId, long refreshExpirationMs) {
+    public RefreshToken(Long userId, String username, String role, long refreshExpirationMs) {
         this.token = UUID.randomUUID().toString();
         this.userId = userId;
+        this.username = username;
+        this.role = role;
         this.createdAt = LocalDateTime.now();
         this.expiresAt = this.createdAt.plusSeconds(refreshExpirationMs / 1000);
     }
 
-    public static RefreshToken create(Long userId, long refreshExpirationMs) {
-        return new RefreshToken(userId, refreshExpirationMs);
+    public static RefreshToken create(Long userId, String username, String role, long refreshExpirationMs) {
+        return new RefreshToken(userId, username, role, refreshExpirationMs);
     }
 
     public boolean isExpired() {
