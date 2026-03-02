@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import {
   getArticle, increaseViewCount, deleteArticle, adminDeleteArticle,
-  toggleLike, toggleDislike, toggleNotice, bumpArticle, resetPopular,
+  toggleLike, toggleDislike, toggleNotice, bumpArticle, resetPopular, restorePopular,
 } from '../api/articleApi'
 import { useAuth } from '../context/AuthContext'
 import CommentList from '../components/CommentList'
@@ -87,6 +87,16 @@ export default function ArticleDetailPage() {
     }
   }
 
+  const handleRestorePopular = async () => {
+    if (!window.confirm('인기글로 등재하시겠습니까?')) return
+    try {
+      await restorePopular(id)
+      fetchArticle()
+    } catch (err) {
+      alert(err.response?.data?.message || '오류가 발생했습니다.')
+    }
+  }
+
   const handleLike = async () => {
     try {
       await toggleLike(id)
@@ -123,6 +133,7 @@ export default function ArticleDetailPage() {
           <div style={styles.titleRow}>
             <div style={styles.titleLeft}>
               {article.isNotice && <span style={styles.noticeBadge}>공지</span>}
+              {article.isPopular && !article.isPopularBlocked && <span style={styles.popularBadge}>인기</span>}
               <h1 style={styles.title}>{article.title}</h1>
             </div>
 
@@ -146,8 +157,11 @@ export default function ArticleDetailPage() {
                   <button onClick={handleToggleNotice} style={{ ...styles.btn, ...styles.btnManager }}>
                     {article.isNotice ? '공지 해제' : '공지'}
                   </button>
-                  {article.isPopular && (
+                  {article.isPopular && !article.isPopularBlocked && (
                     <button onClick={handleResetPopular} style={{ ...styles.btn, ...styles.btnWarning }}>인기글해제</button>
+                  )}
+                  {article.isPopular && article.isPopularBlocked && (
+                    <button onClick={handleRestorePopular} style={{ ...styles.btn, ...styles.btnManager }}>인기글등재</button>
                   )}
                 </>
               )}
@@ -213,7 +227,8 @@ const styles = {
     display: 'flex',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
-    gap: '16px',
+    flexWrap: 'wrap',
+    gap: '8px',
     marginBottom: '8px',
   },
   titleLeft: {
@@ -231,6 +246,14 @@ const styles = {
     borderRadius: '4px',
     flexShrink: 0,
   },
+  popularBadge: {
+    backgroundColor: '#f57c00',
+    color: '#fff',
+    fontSize: '0.75rem',
+    padding: '2px 8px',
+    borderRadius: '4px',
+    flexShrink: 0,
+  },
   title: {
     margin: 0,
     fontSize: '1.5rem',
@@ -239,9 +262,9 @@ const styles = {
   },
   actionBar: {
     display: 'flex',
+    flexWrap: 'wrap',
     gap: '6px',
     alignItems: 'center',
-    flexShrink: 0,
   },
   btn: {
     padding: '5px 12px',
