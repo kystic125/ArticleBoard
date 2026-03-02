@@ -32,4 +32,6 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
     @Modifying
     @Query("UPDATE Article a SET a.viewCount = a.viewCount + 1 WHERE a.articleId = :articleId")
     void increaseViewCount(@Param("articleId") Long articleId);
-}
+
+    Page<Article> findByIsNoticeFalse(Pageable pageable);
+} 
