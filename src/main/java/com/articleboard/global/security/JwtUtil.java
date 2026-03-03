@@ -55,4 +55,9 @@ public class JwtUtil {
     public Long getUserId(String token) {
         return parseClaims(token).get("userId", Long.class);
     }
+
+    public long getRemainingExpiration(String token) {
+        Date expiration = parseClaims(token).getExpiration();
+        return expiration.getTime() - System.currentTimeMillis();
+    }
 }

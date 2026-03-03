@@ -4,6 +4,7 @@ import com.articleboard.auth.dto.AuthResponseDto;
 import com.articleboard.auth.dto.LoginRequestDto;
 import com.articleboard.auth.dto.RefreshRequestDto;
 import com.articleboard.auth.service.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -30,8 +31,19 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@AuthenticationPrincipal Long userId) {
-        authService.logout(userId);
+    public ResponseEntity<Void> logout(@AuthenticationPrincipal Long userId,
+                                       HttpServletRequest request,
+                                       @RequestBody RefreshRequestDto refreshRequest) {
+        String accessToken = resolveToken(request);
+        authService.logout(accessToken, refreshRequest.getRefreshToken());
         return ResponseEntity.noContent().build();
+    }
+
+    private String resolveToken(HttpServletRequest request) {
+        String bearer = request.getHeader("Authorization");
+        if (bearer != null && bearer.startsWith("Bearer ")) {
+            return bearer.substring(7);
+        }
+        return null;
     }
 }
