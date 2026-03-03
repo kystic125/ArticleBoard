@@ -1,50 +1,54 @@
 package com.articleboard.auth.service;
 
-import com.articleboard.auth.entity.RefreshToken;
-import com.articleboard.auth.repository.RefreshTokenRepository;
+import com.articleboard.auth.dto.RefreshTokenData;
 import com.articleboard.global.exception.CustomException;
 import com.articleboard.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class RefreshTokenService {
 
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final RedisTemplate<String, String> redisTemplate;
+
+    private static final String PREFIX = "refreshToken:";
 
     @Value("${jwt.refresh-expiration}")
     private long refreshExpiration;
 
-    @Transactional
-    public RefreshToken create(Long userId, String username, String role) {
-        RefreshToken refreshToken = RefreshToken.create(userId, username, role, refreshExpiration);
-        return refreshTokenRepository.save(refreshToken);
+    public String create(Long userId, String username, String role) {
+        String token = UUID.randomUUID().toString();
+        String value = userId + "|" + username + "|" + role;
+        redisTemplate.opsForValue().set(PREFIX + token, value, refreshExpiration, TimeUnit.MILLISECONDS);
+        return token;
     }
 
-    @Transactional
-    public RefreshToken validate(String token) {
-        RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
-                .orElseThrow(() -> new CustomException(ErrorCode.REFRESH_TOKEN_NOT_FOUND));
-        if (refreshToken.isExpired()) {
-            refreshTokenRepository.delete(refreshToken);
-            throw new CustomException(ErrorCode.REFRESH_TOKEN_EXPIRED);
+    public RefreshTokenData validate(String token) {
+        String value = redisTemplate.opsForValue().get(PREFIX + token);
+        if (value == null) {
+            throw new CustomException(ErrorCode.REFRESH_TOKEN_NOT_FOUND);
         }
-
-        return refreshToken;
+        String[] parts = value.split("\\|");
+        return new RefreshTokenData(Long.parseLong(parts[0]), parts[1], parts[2]);
     }
 
-    @Transactional
-    public RefreshToken rotate(RefreshToken oldToken) {
-        refreshTokenRepository.delete(oldToken);
-        return create(oldToken.getUserId(), oldToken.getUsername(), oldToken.getRole());
+    public String rotate(String oldToken, RefreshTokenData data) {
+        redisTemplate.delete(PREFIX + oldToken);
+        return create(data.getUserId(), data.getUsername(), data.getRole());
     }
 
-    @Transactional
     public void deleteByUserId(Long userId) {
-        refreshTokenRepository.deleteByUserId(userId);
+        throw new UnsupportedOperationException("deleteByToken() 사용");
     }
+
+    public void deleteByToken(String token) {
+        redisTemplate.delete(PREFIX + token);
+    }
+
 }
