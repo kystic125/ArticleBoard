@@ -1,9 +1,12 @@
 package com.articleboard.article.service;
 
 import com.articleboard.article.entity.*;
+import com.articleboard.article.event.ArticlePopularBlockedEvent;
+import com.articleboard.article.event.ArticlePopularizedEvent;
 import com.articleboard.article.repository.ArticleDislikeRepository;
 import com.articleboard.article.repository.ArticleLikeRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +18,7 @@ public class ArticleVoteService {
     private final ArticleLikeRepository articleLikeRepository;
     private final ArticleDislikeRepository articleDislikeRepository;
     private final ArticleService articleService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public void toggleLike(Long articleId, Long userId) {
@@ -28,7 +32,11 @@ public class ArticleVoteService {
                         },
                         () -> {
                             articleLikeRepository.save(ArticleLike.createArticleLike(article, userId));
+                            boolean wasPopular = article.getIsPopular();
                             article.increaseLikeCount();
+                            if (!wasPopular && article.getIsPopular()) {
+                                eventPublisher.publishEvent(new ArticlePopularizedEvent(articleId));
+                            }
                         }
                 );
     }
@@ -45,7 +53,11 @@ public class ArticleVoteService {
                         },
                         () -> {
                             articleDislikeRepository.save(ArticleDislike.createArticleDislike(article, userId));
+                            boolean wasBlocked = article.getIsPopularBlocked();
                             article.increaseDislikeCount();
+                            if (!wasBlocked && article.getIsPopularBlocked()) {
+                                eventPublisher.publishEvent(new ArticlePopularBlockedEvent(articleId));
+                            }
                         }
                 );
     }

@@ -118,6 +118,9 @@ public class Article {
 
     public void increaseDislikeCount() {
         this.dislikeCount += 1;
+        if (this.dislikeCount > 15 && this.isPopular) {
+            this.isPopularBlocked = true;
+        }
     }
 
     public void decreaseDislikeCount() {
@@ -142,5 +145,11 @@ public class Article {
 
     public void restorePopular() {
         this.isPopularBlocked = false;
+    }
+
+    public void validateNotPopular() {
+        if (Boolean.TRUE.equals(this.isPopular)) {
+            throw new CustomException(ErrorCode.POPULAR_ARTICLE_CANNOT_EDIT);
+        }
     }
 }
