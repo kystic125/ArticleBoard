@@ -141,7 +141,9 @@ export default function ArticleDetailPage() {
             <div style={styles.actionBar}>
               {isOwner && (
                 <>
-                  <button onClick={() => navigate(`/articles/${id}/edit`)} style={styles.btn}>수정</button>
+                  {!article.isPopular && (
+                    <button onClick={() => navigate(`/articles/${id}/edit`)} style={styles.btn}>수정</button>
+                  )}
                   <button onClick={handleDelete} style={{ ...styles.btn, ...styles.btnDanger }}>삭제</button>
                   {isManager && (
                     <button onClick={handleToggleNotice} style={{ ...styles.btn, ...styles.btnManager }}>

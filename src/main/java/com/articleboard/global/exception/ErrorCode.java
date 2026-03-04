@@ -13,6 +13,7 @@ public enum ErrorCode {
     DUPLICATE_NICKNAME(HttpStatus.CONFLICT, "이미 사용 중인 닉네임입니다"),
 
     ARTICLE_NOT_FOUND(HttpStatus.NOT_FOUND, "게시글 없음"),
+    POPULAR_ARTICLE_CANNOT_EDIT(HttpStatus.FORBIDDEN, "인기글은 수정할 수 없습니다"),
     INVALID_SEARCH_TYPE(HttpStatus.BAD_REQUEST, "잘못된 검색 타입"),
 
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "댓글 없음"),
