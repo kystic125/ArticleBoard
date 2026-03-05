@@ -7,6 +7,7 @@ import com.articleboard.article.entity.Article;
 import com.articleboard.article.event.ArticlePopularBlockedEvent;
 import com.articleboard.article.event.ArticlePopularizedEvent;
 import com.articleboard.article.repository.ArticleRepository;
+import com.articleboard.article.repository.ArticleSearchCondition;
 import com.articleboard.global.exception.CustomException;
 import com.articleboard.global.exception.ErrorCode;
 import com.articleboard.user.entity.User;
@@ -62,47 +63,62 @@ public class ArticleService {
     }
 
     public Page<ArticleListDto> getArticleList(Pageable pageable) {
-        return articleRepository.findAll(pageable)
-                .map(ArticleListDto::from);
-    }
-
-    public Page<ArticleListDto> searchByTitle(String keyword, Pageable pageable) {
-        return articleRepository.findByTitleContaining(keyword, pageable)
-                .map(ArticleListDto::from);
-    }
-
-    public Page<ArticleListDto> searchByTitleOrContent(String keyword, Pageable pageable) {
-        return articleRepository.findByTitleContainingOrContentContaining(keyword, keyword, pageable)
-                .map(ArticleListDto::from);
-    }
-
-    public Page<ArticleListDto> searchByContent(String keyword, Pageable pageable) {
-        return articleRepository.findByContentContaining(keyword, pageable)
-                .map(ArticleListDto::from);
-    }
-
-    public Page<ArticleListDto> searchByWriter(String keyword, Pageable pageable) {
-        return articleRepository.findByWriterContaining(keyword, pageable)
+        ArticleSearchCondition condition = ArticleSearchCondition.builder()
+                .category(ArticleSearchCondition.Category.ALL)
+                .build();
+        return articleRepository.searchArticles(condition, pageable)
                 .map(ArticleListDto::from);
     }
 
     @Cacheable(value = "popularArticles")
-    public Page<ArticleListDto> getPopularArticles(Long minLikeCount, Long maxDislikeCount, Pageable pageable) {
-        return articleRepository.findPopularArticles(minLikeCount, maxDislikeCount, pageable)
+    public Page<ArticleListDto> getPopularArticles(Long minLike, Long maxDislike, Pageable pageable) {
+        ArticleSearchCondition condition = ArticleSearchCondition.builder()
+                .category(ArticleSearchCondition.Category.POPULAR)
+                .minLike(minLike)
+                .maxDislike(maxDislike)
+                .build();
+        return articleRepository.searchArticles(condition, pageable)
                 .map(ArticleListDto::from);
     }
 
     public Page<ArticleListDto> getNoticeArticles(Pageable pageable) {
-        return articleRepository.findByIsNotice(true, pageable)
+        ArticleSearchCondition condition = ArticleSearchCondition.builder()
+                .category(ArticleSearchCondition.Category.NOTICE)
+                .build();
+        return articleRepository.searchArticles(condition, pageable)
                 .map(ArticleListDto::from);
     }
 
     public Page<ArticleListDto> search(String type, String keyword, Pageable pageable) {
+        return searchInCategory("all", type, keyword, null, null, pageable);
+    }
+
+    public Page<ArticleListDto> searchInCategory(String category, String type, String keyword, Long minLike, Long maxDislike, Pageable pageable) {
+        ArticleSearchCondition condition = ArticleSearchCondition.builder()
+                .category(parseCategory(category))
+                .searchType(parseSearchType(type))
+                .keyword(keyword)
+                .minLike(minLike)
+                .maxDislike(maxDislike)
+                .build();
+        return articleRepository.searchArticles(condition, pageable)
+                .map(ArticleListDto::from);
+    }
+
+    private ArticleSearchCondition.Category parseCategory(String category) {
+        return switch (category.toLowerCase()) {
+            case "popular" -> ArticleSearchCondition.Category.POPULAR;
+            case "notice" -> ArticleSearchCondition.Category.NOTICE;
+            default -> ArticleSearchCondition.Category.ALL;
+        };
+    }
+
+    private ArticleSearchCondition.SearchType parseSearchType(String type) {
         return switch (type) {
-            case "title" -> searchByTitle(keyword, pageable);
-            case "title-content" -> searchByTitleOrContent(keyword, pageable);
-            case "content" -> searchByContent(keyword, pageable);
-            case "writer" -> searchByWriter(keyword, pageable);
+            case "title" -> ArticleSearchCondition.SearchType.TITLE;
+            case "content" -> ArticleSearchCondition.SearchType.CONTENT;
+            case "title-content" -> ArticleSearchCondition.SearchType.TITLE_CONTENT;
+            case "writer" -> ArticleSearchCondition.SearchType.WRITER;
             default -> throw new CustomException(ErrorCode.INVALID_SEARCH_TYPE);
         };
     }
