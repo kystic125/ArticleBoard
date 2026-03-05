@@ -38,3 +38,6 @@ out/
 
 .env
 frontend/node_modules/
+
+# QueryDSL
+build/generated/
