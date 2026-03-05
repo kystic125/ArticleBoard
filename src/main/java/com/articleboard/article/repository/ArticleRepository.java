@@ -10,28 +10,11 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ArticleRepository extends JpaRepository<Article, Long> {
-
-    Page<Article> findByIsNotice(boolean isNotice, Pageable pageable);
-
-    Page<Article> findByTitleContaining(String title, Pageable pageable);
-
-    Page<Article> findByContentContaining(String content, Pageable pageable);
-
-    Page<Article> findByTitleContainingOrContentContaining(String title, String content, Pageable pageable);
-
-    Page<Article> findByWriterContaining(String writer, Pageable pageable);
-
-    Page<Article> findByLikeCountGreaterThanEqual(Long likeCount, Pageable pageable);
+public interface ArticleRepository extends JpaRepository<Article, Long>, ArticleRepositoryCustom {
 
     Page<Article> findByUser_UserId(Long userId, Pageable pageable);
-
-    @Query("SELECT a FROM Article a WHERE a.isPopular = true AND a.isPopularBlocked = false AND a.likeCount >= :minLike AND a.dislikeCount <= :minDislike")
-    Page<Article> findPopularArticles(@Param("minLike") Long minLike, @Param("minDislike") Long maxDislike, Pageable pageable);
 
     @Modifying
     @Query("UPDATE Article a SET a.viewCount = a.viewCount + 1 WHERE a.articleId = :articleId")
     void increaseViewCount(@Param("articleId") Long articleId);
-
-    Page<Article> findByIsNoticeFalse(Pageable pageable);
 } 
