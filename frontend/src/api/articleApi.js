@@ -36,6 +36,12 @@ export const restorePopular = (id) =>
 export const adminDeleteArticle = (id) =>
   axiosInstance.delete(`/api/articles/${id}/admin`)
 
+export const getPopularArticles = (page = 0, size = 10) =>
+  axiosInstance.get('/api/articles/popular', { params: { page, size, sort: 'updatedAt,desc' } })
+
+export const getNoticeArticles = (page = 0, size = 10) =>
+  axiosInstance.get('/api/articles/notice', { params: { page, size, sort: 'updatedAt,desc' } })
+
 export const toggleLike = (id) =>
   axiosInstance.post(`/api/articles/${id}/votes/like`)
 

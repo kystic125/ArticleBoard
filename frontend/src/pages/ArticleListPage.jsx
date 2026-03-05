@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getArticleList, searchArticles } from '../api/articleApi'
+import { getArticleList, searchArticles, getPopularArticles, getNoticeArticles } from '../api/articleApi'
 import { useAuth } from '../context/AuthContext'
 import ArticleCard from '../components/ArticleCard'
 import Pagination from '../components/Pagination'
@@ -12,6 +12,12 @@ const SEARCH_TYPES = [
   { value: 'writer', label: '작성자' },
 ]
 
+const TABS = [
+  { value: 'all', label: '전체' },
+  { value: 'popular', label: '인기글' },
+  { value: 'notice', label: '공지' },
+]
+
 export default function ArticleListPage() {
   const [articles, setArticles] = useState([])
   const [page, setPage] = useState(0)
@@ -19,6 +25,7 @@ export default function ArticleListPage() {
   const [searchType, setSearchType] = useState('title')
   const [keyword, setKeyword] = useState('')
   const [activeSearch, setActiveSearch] = useState(null)
+  const [activeTab, setActiveTab] = useState('all')
   const [loading, setLoading] = useState(false)
   const { isAuthenticated } = useAuth()
   const navigate = useNavigate()
@@ -27,7 +34,11 @@ export default function ArticleListPage() {
     setLoading(true)
     try {
       let res
-      if (activeSearch) {
+      if (activeTab === 'popular') {
+        res = await getPopularArticles(pageNum)
+      } else if (activeTab === 'notice') {
+        res = await getNoticeArticles(pageNum)
+      } else if (activeSearch) {
         res = await searchArticles(activeSearch.type, activeSearch.keyword, pageNum)
       } else {
         res = await getArticleList(pageNum)
@@ -44,7 +55,7 @@ export default function ArticleListPage() {
 
   useEffect(() => {
     fetchArticles(page)
-  }, [page, activeSearch])
+  }, [page, activeSearch, activeTab])
 
   const handleSearch = (e) => {
     e.preventDefault()
@@ -59,6 +70,13 @@ export default function ArticleListPage() {
   const handleReset = () => {
     setKeyword('')
     setActiveSearch(null)
+    setPage(0)
+  }
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab)
+    setActiveSearch(null)
+    setKeyword('')
     setPage(0)
   }
 
@@ -78,6 +96,7 @@ export default function ArticleListPage() {
           value={searchType}
           onChange={(e) => setSearchType(e.target.value)}
           style={styles.select}
+          disabled={activeTab !== 'all'}
         >
           {SEARCH_TYPES.map((t) => (
             <option key={t.value} value={t.value}>{t.label}</option>
@@ -87,14 +106,30 @@ export default function ArticleListPage() {
           type="text"
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
-          placeholder="검색어를 입력하세요"
+          placeholder={activeTab !== 'all' ? '전체 탭에서만 검색 가능합니다' : '검색어를 입력하세요'}
           style={styles.searchInput}
+          disabled={activeTab !== 'all'}
         />
-        <button type="submit" style={styles.searchButton}>검색</button>
+        <button type="submit" style={styles.searchButton} disabled={activeTab !== 'all'}>검색</button>
         {activeSearch && (
           <button type="button" onClick={handleReset} style={styles.resetButton}>초기화</button>
         )}
       </form>
+
+      <div style={styles.tabBar}>
+        {TABS.map((tab) => (
+          <button
+            key={tab.value}
+            onClick={() => handleTabChange(tab.value)}
+            style={{
+              ...styles.tabButton,
+              ...(activeTab === tab.value ? styles.tabButtonActive : {}),
+            }}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
 
       <div style={styles.list}>
         {loading ? (
@@ -137,11 +172,12 @@ const styles = {
     border: 'none',
     borderRadius: '4px',
     fontSize: '0.9rem',
+    cursor: 'pointer',
   },
   searchForm: {
     display: 'flex',
     gap: '8px',
-    marginBottom: '16px',
+    marginBottom: '0',
   },
   select: {
     padding: '8px 10px',
@@ -163,6 +199,7 @@ const styles = {
     border: 'none',
     borderRadius: '4px',
     fontSize: '0.9rem',
+    cursor: 'pointer',
   },
   resetButton: {
     padding: '8px 12px',
@@ -171,11 +208,34 @@ const styles = {
     border: '1px solid #ccc',
     borderRadius: '4px',
     fontSize: '0.9rem',
+    cursor: 'pointer',
+  },
+  tabBar: {
+    display: 'flex',
+    borderBottom: '2px solid #ddd',
+    margin: '12px 0 0 0',
+  },
+  tabButton: {
+    padding: '8px 20px',
+    background: 'none',
+    border: 'none',
+    borderBottom: '2px solid transparent',
+    marginBottom: '-2px',
+    fontSize: '0.95rem',
+    color: '#888',
+    cursor: 'pointer',
+    fontWeight: '400',
+  },
+  tabButtonActive: {
+    color: '#1976d2',
+    borderBottom: '2px solid #1976d2',
+    fontWeight: '600',
   },
   list: {
     backgroundColor: '#fff',
     border: '1px solid #eee',
-    borderRadius: '4px',
+    borderTop: 'none',
+    borderRadius: '0 0 4px 4px',
     overflow: 'hidden',
   },
   message: {
