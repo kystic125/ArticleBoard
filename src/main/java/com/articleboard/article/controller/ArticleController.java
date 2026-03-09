@@ -61,7 +61,7 @@ public class ArticleController {
     public ResponseEntity<Page<ArticleListDto>> search(@RequestParam String type,
                                                        @RequestParam String keyword,
                                                        Pageable pageable) {
-        return ResponseEntity.ok(articleService.search(type, keyword, pageable));
+        return ResponseEntity.ok(articleService.searchInCategory("all", type, keyword, null, null, pageable));
     }
 
     @GetMapping("/popular")
@@ -74,6 +74,22 @@ public class ArticleController {
     @GetMapping("/notice")
     public ResponseEntity<Page<ArticleListDto>> getNoticeArticles(Pageable pageable) {
         return ResponseEntity.ok(articleService.getNoticeArticles(pageable));
+    }
+
+    @GetMapping("/popular/search")
+    public ResponseEntity<Page<ArticleListDto>> searchInPopular(@RequestParam String type,
+                                                                @RequestParam String keyword,
+                                                                @RequestParam(defaultValue = "10") Long minLike,
+                                                                @RequestParam(defaultValue = "15") Long maxDislike,
+                                                                Pageable pageable) {
+        return ResponseEntity.ok(articleService.searchInCategory("popular", type, keyword, minLike, maxDislike, pageable));
+    }
+
+    @GetMapping("/notice/search")
+    public ResponseEntity<Page<ArticleListDto>> searchInNotice(@RequestParam String type,
+                                                               @RequestParam String keyword,
+                                                               Pageable pageable) {
+        return ResponseEntity.ok(articleService.searchInCategory("notice", type, keyword, null, null, pageable));
     }
 
     @DeleteMapping("/{articleId}/admin")
