@@ -18,6 +18,12 @@ export const deleteArticle = (id) =>
 export const searchArticles = (type, keyword, page = 0, size = 10) =>
   axiosInstance.get('/api/articles/search', { params: { type, keyword, page, size, sort: 'updatedAt,desc' } })
 
+export const searchPopularArticles = (type, keyword, page = 0, size = 10) =>
+  axiosInstance.get('/api/articles/popular/search', { params: { type, keyword, page, size, sort: 'updatedAt,desc' } })
+
+export const searchNoticeArticles = (type, keyword, page = 0, size = 10) =>
+  axiosInstance.get('/api/articles/notice/search', { params: { type, keyword, page, size, sort: 'updatedAt,desc' } })
+
 export const increaseViewCount = (id) =>
   axiosInstance.post(`/api/articles/${id}/view`)
 
