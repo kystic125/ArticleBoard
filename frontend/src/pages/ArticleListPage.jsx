@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getArticleList, searchArticles, getPopularArticles, getNoticeArticles } from '../api/articleApi'
+import { getArticleList, searchArticles, searchPopularArticles, searchNoticeArticles, getPopularArticles, getNoticeArticles } from '../api/articleApi'
 import { useAuth } from '../context/AuthContext'
 import ArticleCard from '../components/ArticleCard'
 import Pagination from '../components/Pagination'
@@ -34,12 +34,18 @@ export default function ArticleListPage() {
     setLoading(true)
     try {
       let res
-      if (activeTab === 'popular') {
+      if (activeSearch) {
+        if (activeTab === 'popular') {
+          res = await searchPopularArticles(activeSearch.type, activeSearch.keyword, pageNum)
+        } else if (activeTab === 'notice') {
+          res = await searchNoticeArticles(activeSearch.type, activeSearch.keyword, pageNum)
+        } else {
+          res = await searchArticles(activeSearch.type, activeSearch.keyword, pageNum)
+        }
+      } else if (activeTab === 'popular') {
         res = await getPopularArticles(pageNum)
       } else if (activeTab === 'notice') {
         res = await getNoticeArticles(pageNum)
-      } else if (activeSearch) {
-        res = await searchArticles(activeSearch.type, activeSearch.keyword, pageNum)
       } else {
         res = await getArticleList(pageNum)
       }
@@ -96,7 +102,6 @@ export default function ArticleListPage() {
           value={searchType}
           onChange={(e) => setSearchType(e.target.value)}
           style={styles.select}
-          disabled={activeTab !== 'all'}
         >
           {SEARCH_TYPES.map((t) => (
             <option key={t.value} value={t.value}>{t.label}</option>
@@ -106,11 +111,10 @@ export default function ArticleListPage() {
           type="text"
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
-          placeholder={activeTab !== 'all' ? '전체 탭에서만 검색 가능합니다' : '검색어를 입력하세요'}
+          placeholder="검색어를 입력하세요"
           style={styles.searchInput}
-          disabled={activeTab !== 'all'}
         />
-        <button type="submit" style={styles.searchButton} disabled={activeTab !== 'all'}>검색</button>
+        <button type="submit" style={styles.searchButton}>검색</button>
         {activeSearch && (
           <button type="button" onClick={handleReset} style={styles.resetButton}>초기화</button>
         )}
