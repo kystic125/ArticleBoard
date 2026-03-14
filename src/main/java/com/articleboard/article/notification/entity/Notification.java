@@ -38,6 +38,9 @@ public class Notification {
     @Column(nullable = false)
     private Boolean isRead = false;
 
+    @Column(nullable = false)
+    private Boolean isChecked = false;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -57,5 +60,9 @@ public class Notification {
 
     public void markAsRead() {
         this.isRead = true;
+    }
+
+    public void markAsChecked() {
+        this.isChecked = true;
     }
 }
