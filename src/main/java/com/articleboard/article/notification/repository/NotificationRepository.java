@@ -24,12 +24,8 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     long countUnreadByUserId(@Param("userId") Long userId);
 
     @Modifying
-    @Query("UPDATE Notification n SET n.isRead = true WHERE n.notificationId IN :notificationIds AND n.userId = :userId")
-    void markAsReadByIds(@Param("notificationIds") List<Long> notificationIds, @Param("userId") Long userId);
-
-    @Modifying
-    @Query("UPDATE Notification n SET n.isRead = true, n.isChecked = true WHERE n.notificationId = :notificationId AND n.userId = :userId")
-    void markAsChecked(@Param("notificationId") Long notificationId, @Param("userId") Long userId);
+    @Query("UPDATE Notification n SET n.isRead = true WHERE n.userId = :userId AND n.isRead = false")
+    void markAllAsRead(@Param("userId") Long userId);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("DELETE FROM Notification n WHERE n.createdAt < :before")
