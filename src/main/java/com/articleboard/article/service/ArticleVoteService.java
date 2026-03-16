@@ -35,7 +35,7 @@ public class ArticleVoteService {
                             boolean wasPopular = article.getIsPopular();
                             article.increaseLikeCount();
                             if (!wasPopular && article.getIsPopular()) {
-                                eventPublisher.publishEvent(new ArticlePopularizedEvent(articleId));
+                                eventPublisher.publishEvent(new ArticlePopularizedEvent(articleId, article.getUser().getUserId()));
                             }
                         }
                 );

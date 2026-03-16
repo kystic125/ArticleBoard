@@ -1,6 +1,7 @@
 package com.articleboard.comment.service;
 
 import com.articleboard.article.entity.Article;
+import com.articleboard.article.notification.event.CommentCreateEvent;
 import com.articleboard.article.repository.ArticleRepository;
 import com.articleboard.comment.dto.CommentRequestDto;
 import com.articleboard.comment.dto.CommentResponseDto;
@@ -11,6 +12,7 @@ import com.articleboard.global.exception.ErrorCode;
 import com.articleboard.user.entity.User;
 import com.articleboard.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,14 +26,24 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final ArticleRepository articleRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public Long createComment(CommentRequestDto dto, Long articleId, Long userId) {
         User user = findUser(userId);
         Article article = findArticle(articleId);
-        Comment comment = Comment.createComment(dto.getContent(), article, user);
+        Comment comment = commentRepository.save(Comment.createComment(dto.getContent(), article, user));
 
-        return commentRepository.save(comment).getCommentId();
+        eventPublisher.publishEvent(new CommentCreateEvent(
+                articleId,
+                article.getUser().getUserId(),
+                null,
+                comment.getCommentId(),
+                false,
+                dto.getContent()
+        ));
+
+        return comment.getCommentId();
     }
 
     @Transactional
@@ -89,6 +101,22 @@ public class CommentService {
     public Long createChildComment(CommentRequestDto dto, Long userId, Long targetId) {
         User user = findUser(userId);
         Comment target = findComment(targetId);
-        return commentRepository.save(Comment.createReply(dto.getContent(), user, target)).getCommentId();
+        Comment comment = commentRepository.save(Comment.createReply(dto.getContent(), user, target));
+
+        Long rootId = comment.getRootId();
+        Comment root = findComment(rootId);
+        Long rootAuthorId = root.getUser().getUserId();
+        Long articleAuthorId = comment.getArticle().getUser().getUserId();
+
+        eventPublisher.publishEvent(new CommentCreateEvent(
+                comment.getArticle().getArticleId(),
+                articleAuthorId,
+                rootAuthorId,
+                comment.getCommentId(),
+                true,
+                dto.getContent()
+        ));
+
+        return comment.getCommentId();
     }
 }
