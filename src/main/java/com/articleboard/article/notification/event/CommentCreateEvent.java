@@ -8,8 +8,9 @@ import lombok.RequiredArgsConstructor;
 public class CommentCreateEvent {
     private final Long articleId;
     private final Long articleAuthorId;
-    private final Long rootAuthorId;
+    private final Long parentAuthorId;
     private final Long commentId;
-    private final boolean isReply;
+    private final Long commenterId;
+    private final Boolean isReply;
     private final String content;
 }

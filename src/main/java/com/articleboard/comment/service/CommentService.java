@@ -39,6 +39,7 @@ public class CommentService {
                 article.getUser().getUserId(),
                 null,
                 comment.getCommentId(),
+                userId,
                 false,
                 dto.getContent()
         ));
@@ -103,16 +104,15 @@ public class CommentService {
         Comment target = findComment(targetId);
         Comment comment = commentRepository.save(Comment.createReply(dto.getContent(), user, target));
 
-        Long rootId = comment.getRootId();
-        Comment root = findComment(rootId);
-        Long rootAuthorId = root.getUser().getUserId();
+        Long parentAuthorId = target.getUser().getUserId();
         Long articleAuthorId = comment.getArticle().getUser().getUserId();
 
         eventPublisher.publishEvent(new CommentCreateEvent(
-                comment.getArticle().getArticleId(),
+                target.getArticle().getArticleId(),
                 articleAuthorId,
-                rootAuthorId,
+                parentAuthorId,
                 comment.getCommentId(),
+                userId,
                 true,
                 dto.getContent()
         ));
