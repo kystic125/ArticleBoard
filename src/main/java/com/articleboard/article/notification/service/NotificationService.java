@@ -3,6 +3,7 @@ package com.articleboard.article.notification.service;
 import com.articleboard.article.notification.repository.SseEmitterRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -13,12 +14,13 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class NotificationService {
 
-    private static final long SSE_TIMEOUT = 5 * 60 * 1000L;
     private final SseEmitterRepository sseEmitterRepository;
 
     public SseEmitter subscribe(Long userId) {
-        SseEmitter emitter = new SseEmitter(SSE_TIMEOUT);
+        SseEmitter emitter = new SseEmitter(-1L);
 
+        sseEmitterRepository.findByUserId(userId)
+                .ifPresent(SseEmitter::complete);
         sseEmitterRepository.save(userId, emitter);
 
         emitter.onCompletion(() -> sseEmitterRepository.deleteByUserId(userId));
@@ -32,5 +34,16 @@ public class NotificationService {
         }
 
         return emitter;
+    }
+
+    @Scheduled(fixedDelay = 30000)
+    public void sendHeartbeat() {
+        sseEmitterRepository.findAll().forEach(emitter -> {
+            try {
+                emitter.send(SseEmitter.event().name("heartbeat").data(""));
+            } catch (IOException e) {
+                emitter.complete();
+            }
+        });
     }
 }

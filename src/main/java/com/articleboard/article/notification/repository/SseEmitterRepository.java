@@ -3,6 +3,7 @@ package com.articleboard.article.notification.repository;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,5 +24,9 @@ public class SseEmitterRepository {
 
     public void deleteByUserId(Long userId) {
         emitters.remove(userId);
+    }
+
+    public Collection<SseEmitter> findAll() {
+        return emitters.values();
     }
 }
