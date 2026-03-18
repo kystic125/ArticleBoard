@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -87,5 +88,11 @@ public class NotificationService {
     @Transactional
     public void readAll(Long userId) {
         notificationRepository.markAllAsRead(userId);
+    }
+
+    @Transactional
+    @Scheduled(cron = "0 0 3 * * *")
+    public void deleteOldNotifications() {
+        notificationRepository.deleteOlderThan(LocalDateTime.now().minusDays(3));
     }
 }
