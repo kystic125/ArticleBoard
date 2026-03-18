@@ -5,7 +5,6 @@ import com.articleboard.article.dto.ArticleRequestDto;
 import com.articleboard.article.dto.ArticleResponseDto;
 import com.articleboard.article.entity.Article;
 import com.articleboard.article.event.ArticlePopularBlockedEvent;
-import com.articleboard.article.event.ArticlePopularizedEvent;
 import com.articleboard.article.repository.ArticleRepository;
 import com.articleboard.article.repository.ArticleSearchCondition;
 import com.articleboard.global.exception.CustomException;
@@ -157,6 +156,5 @@ public class ArticleService {
     @Transactional
     public void restorePopular(Long articleId) {
         findById(articleId).restorePopular();
-        eventPublisher.publishEvent(new ArticlePopularizedEvent(articleId));
     }
 }
