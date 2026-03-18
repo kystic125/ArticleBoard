@@ -46,4 +46,14 @@ public class NotificationService {
             }
         });
     }
+
+    public void sendToUser(Long userId, String eventName, Object data) {
+        sseEmitterRepository.findByUserId(userId).ifPresent(emitter -> {
+            try {
+                emitter.send(SseEmitter.event().name(eventName).data(data));
+            } catch (IOException e) {
+                sseEmitterRepository.deleteByUserId(userId);
+            }
+        });
+    }
 }
