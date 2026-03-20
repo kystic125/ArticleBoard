@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { logout as logoutApi } from '../api/authApi'
+import NotificationBell from './NotificationBell'
 
 export default function Navbar() {
   const { isAuthenticated, logout } = useAuth()
@@ -22,6 +23,7 @@ export default function Navbar() {
         {isAuthenticated ? (
           <>
             <Link to="/articles/new" style={styles.link}>글쓰기</Link>
+            <NotificationBell />
             <button onClick={handleLogout} style={styles.button}>로그아웃</button>
           </>
         ) : (
