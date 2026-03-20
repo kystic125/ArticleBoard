@@ -25,7 +25,8 @@ export default function NotificationBell() {
 
   const handleNotificationClick = (notification) => {
     setOpen(false)
-    navigate(`/articles/${notification.articleId}`)
+    const hash = notification.commentId ? `#comment-${notification.commentId}` : ''
+    navigate(`/articles/${notification.articleId}${hash}`)
   }
 
   const handleBellClick = () => {

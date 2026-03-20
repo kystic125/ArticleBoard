@@ -1,10 +1,23 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { updateComment, deleteComment, createReply } from '../api/commentApi'
 
 export default function CommentItem({ comment, replies = [], writerMap = {}, onRefresh }) {
   const { isAuthenticated, userId } = useAuth()
+  const location = useLocation()
   const [editing, setEditing] = useState(false)
+  const [highlighted, setHighlighted] = useState(false)
+  const itemRef = useRef(null)
+
+  useEffect(() => {
+    if (location.hash === `#comment-${comment.commentId}`) {
+      itemRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      setHighlighted(true)
+      const timer = setTimeout(() => setHighlighted(false), 1000)
+      return () => clearTimeout(timer)
+    }
+  }, [location.hash, comment.commentId])
   const [editContent, setEditContent] = useState(comment.content)
   const [showReplyForm, setShowReplyForm] = useState(false)
   const [replyContent, setReplyContent] = useState('')
@@ -55,7 +68,7 @@ export default function CommentItem({ comment, replies = [], writerMap = {}, onR
 
   if (comment.isDeleted) {
     return (
-      <div style={styles.item}>
+      <div id={`comment-${comment.commentId}`} ref={itemRef} style={styles.item}>
         <p style={styles.deletedText}>삭제된 댓글입니다.</p>
         {replies.map((reply) => (
           <CommentItem key={reply.commentId} comment={reply} replies={[]} writerMap={writerMap} onRefresh={onRefresh} />
@@ -65,7 +78,11 @@ export default function CommentItem({ comment, replies = [], writerMap = {}, onR
   }
 
   return (
-    <div style={styles.item}>
+    <div
+      id={`comment-${comment.commentId}`}
+      ref={itemRef}
+      style={{ ...styles.item, ...(highlighted ? styles.itemHighlighted : {}) }}
+    >
       <div style={styles.header}>
         <span style={styles.writer}>{comment.writer}</span>
         <span style={styles.date}>{formatDate(comment.createdAt)}</span>
@@ -134,6 +151,10 @@ const styles = {
   item: {
     padding: '14px 0',
     borderBottom: '1px solid #f0f0f0',
+    transition: 'background-color 0.3s ease',
+  },
+  itemHighlighted: {
+    backgroundColor: '#fff3cd',
   },
   header: {
     display: 'flex',
