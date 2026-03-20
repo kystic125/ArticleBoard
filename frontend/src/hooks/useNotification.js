@@ -40,9 +40,9 @@ export default function useNotification(token) {
 
   const markAllRead = useCallback(async () => {
     if (!token) return
-    await readAll()
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })))
     setUnreadCount(0)
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })))
+    readAll().catch(() => {})
   }, [token])
 
   // SSE 구독

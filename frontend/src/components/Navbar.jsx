@@ -18,7 +18,7 @@ export default function Navbar() {
 
   return (
     <nav style={styles.nav}>
-      <span onClick={() => { window.location.href = '/' }} style={{ ...styles.brand, cursor: 'pointer' }}>ArticleBoard</span>
+      <span onClick={() => navigate('/')} style={{ ...styles.brand, cursor: 'pointer' }}>ArticleBoard</span>
       <div style={styles.links}>
         {isAuthenticated ? (
           <>
