@@ -28,14 +28,17 @@ export default function NotificationBell() {
     navigate(`/articles/${notification.articleId}`)
   }
 
-  const handleReadAll = async (e) => {
-    e.stopPropagation()
-    await markAllRead()
+  const handleBellClick = () => {
+    const wasOpen = open
+    setOpen((prev) => !prev)
+    if (!wasOpen && unreadCount > 0) {
+      markAllRead()
+    }
   }
 
   return (
     <div style={styles.wrapper} ref={dropdownRef}>
-      <button style={styles.bellButton} onClick={() => setOpen((prev) => !prev)}>
+      <button style={styles.bellButton} onClick={handleBellClick}>
         <span style={styles.bellIcon}>🔔</span>
         {unreadCount > 0 && (
           <span style={styles.badge}>{unreadCount > 99 ? '99+' : unreadCount}</span>
@@ -46,11 +49,6 @@ export default function NotificationBell() {
         <div style={styles.dropdown}>
           <div style={styles.dropdownHeader}>
             <span style={styles.dropdownTitle}>알림</span>
-            {unreadCount > 0 && (
-              <button style={styles.readAllButton} onClick={handleReadAll}>
-                전체 읽음
-              </button>
-            )}
           </div>
 
           <div style={styles.list}>
@@ -147,14 +145,6 @@ const styles = {
     fontWeight: 'bold',
     fontSize: '0.95rem',
     color: '#222',
-  },
-  readAllButton: {
-    background: 'none',
-    border: 'none',
-    cursor: 'pointer',
-    fontSize: '0.8rem',
-    color: '#888',
-    padding: 0,
   },
   list: {
     maxHeight: '360px',
