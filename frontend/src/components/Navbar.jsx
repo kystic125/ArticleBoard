@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext'
 import { logout as logoutApi } from '../api/authApi'
 import NotificationBell from './NotificationBell'
 
-export default function Navbar() {
+export default function Navbar({ onLogoClick }) {
   const { isAuthenticated, logout } = useAuth()
   const navigate = useNavigate()
 
@@ -16,9 +16,14 @@ export default function Navbar() {
     navigate('/login')
   }
 
+  const handleLogoClick = () => {
+    navigate('/')
+    onLogoClick?.()
+  }
+
   return (
     <nav style={styles.nav}>
-      <span onClick={() => navigate('/')} style={{ ...styles.brand, cursor: 'pointer' }}>ArticleBoard</span>
+      <span onClick={handleLogoClick} style={{ ...styles.brand, cursor: 'pointer' }}>ArticleBoard</span>
       <div style={styles.links}>
         {isAuthenticated ? (
           <>

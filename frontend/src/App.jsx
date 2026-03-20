@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -9,12 +10,14 @@ import ArticleDetailPage from './pages/ArticleDetailPage'
 import ArticleFormPage from './pages/ArticleFormPage'
 
 export default function App() {
+  const [homeKey, setHomeKey] = useState(0)
+
   return (
     <AuthProvider>
       <BrowserRouter>
-        <Navbar />
+        <Navbar onLogoClick={() => setHomeKey((k) => k + 1)} />
         <Routes>
-          <Route path="/" element={<ArticleListPage />} />
+          <Route path="/" element={<ArticleListPage key={homeKey} />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/articles/:id" element={<ArticleDetailPage />} />

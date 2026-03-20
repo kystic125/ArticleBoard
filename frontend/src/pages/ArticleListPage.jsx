@@ -26,7 +26,7 @@ export default function ArticleListPage() {
   const [keyword, setKeyword] = useState('')
   const [activeSearch, setActiveSearch] = useState(null)
   const [activeTab, setActiveTab] = useState('all')
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const { isAuthenticated } = useAuth()
   const navigate = useNavigate()
 
@@ -136,9 +136,7 @@ export default function ArticleListPage() {
       </div>
 
       <div style={styles.list}>
-        {loading ? (
-          <p style={styles.message}>로딩 중...</p>
-        ) : articles.length === 0 ? (
+        {!loading && articles.length === 0 ? (
           <p style={styles.message}>게시글이 없습니다.</p>
         ) : (
           articles.map((article) => (
