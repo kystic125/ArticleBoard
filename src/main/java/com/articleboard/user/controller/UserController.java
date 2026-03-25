@@ -1,7 +1,7 @@
 package com.articleboard.user.controller;
 
 import com.articleboard.article.dto.ArticleListDto;
-import com.articleboard.comment.dto.CommentResponseDto;
+import com.articleboard.user.dto.MyCommentDto;
 import com.articleboard.user.dto.UserRequestDto;
 import com.articleboard.user.service.UserService;
 import jakarta.validation.Valid;
@@ -33,7 +33,7 @@ public class UserController {
     }
 
     @GetMapping("/me/comments")
-    public ResponseEntity<Page<CommentResponseDto>> getMyComments(
+    public ResponseEntity<Page<MyCommentDto>> getMyComments(
             @AuthenticationPrincipal Long userId,
             @PageableDefault(size = 10, sort = "createdAt") Pageable pageable) {
         return ResponseEntity.ok(userService.getMyComments(userId, pageable));

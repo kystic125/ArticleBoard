@@ -2,10 +2,10 @@ package com.articleboard.user.service;
 
 import com.articleboard.article.dto.ArticleListDto;
 import com.articleboard.article.repository.ArticleRepository;
-import com.articleboard.comment.dto.CommentResponseDto;
 import com.articleboard.comment.repository.CommentRepository;
 import com.articleboard.global.exception.CustomException;
 import com.articleboard.global.exception.ErrorCode;
+import com.articleboard.user.dto.MyCommentDto;
 import com.articleboard.user.dto.UserRequestDto;
 import com.articleboard.user.entity.NicknameType;
 import com.articleboard.user.entity.User;
@@ -54,8 +54,8 @@ public class UserService {
                 .map(ArticleListDto::from);
     }
 
-    public Page<CommentResponseDto> getMyComments(Long userId, Pageable pageable) {
+    public Page<MyCommentDto> getMyComments(Long userId, Pageable pageable) {
         return commentRepository.findByUser_UserId(userId, pageable)
-                .map(CommentResponseDto::from);
+                .map(MyCommentDto::from);
     }
 }
