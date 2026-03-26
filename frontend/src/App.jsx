@@ -8,6 +8,7 @@ import RegisterPage from './pages/RegisterPage'
 import ArticleListPage from './pages/ArticleListPage'
 import ArticleDetailPage from './pages/ArticleDetailPage'
 import ArticleFormPage from './pages/ArticleFormPage'
+import MyPage from './pages/MyPage'
 
 export default function App() {
   const [homeKey, setHomeKey] = useState(0)
@@ -25,6 +26,7 @@ export default function App() {
           <Route element={<ProtectedRoute />}>
             <Route path="/articles/new" element={<ArticleFormPage />} />
             <Route path="/articles/:id/edit" element={<ArticleFormPage />} />
+            <Route path="/mypage" element={<MyPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

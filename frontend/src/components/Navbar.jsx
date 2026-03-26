@@ -28,6 +28,7 @@ export default function Navbar({ onLogoClick }) {
         {isAuthenticated ? (
           <>
             <Link to="/articles/new" style={styles.link}>글쓰기</Link>
+            <Link to="/mypage" style={styles.link}>마이페이지</Link>
             <NotificationBell />
             <button onClick={handleLogout} style={styles.button}>로그아웃</button>
           </>
