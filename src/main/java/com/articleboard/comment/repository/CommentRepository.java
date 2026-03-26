@@ -12,8 +12,10 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     Page<Comment> findByArticle_ArticleId(Long articleId, Pageable pageable);
 
-    @Query("SELECT c FROM Comment c JOIN FETCH c.article WHERE c.user.userId = :userId")
-    Page<Comment> findByUser_UserId(Long userId, Pageable pageable);
+    @Query("SELECT c FROM Comment c JOIN FETCH c.article LEFT JOIN FETCH c.parent WHERE c.user.userId = :userId")
+    Page<Comment> findMyComments(Long userId, Pageable pageable);
 
     boolean existsByRootId(Long rootId);
+
+
 }

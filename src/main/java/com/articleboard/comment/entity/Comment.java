@@ -46,6 +46,10 @@ public class Comment {
     @JoinColumn(name = "article_id", nullable = false)
     private Article article;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id", insertable = false, updatable = false)
+    private Comment parent;
+
     public Comment(String writer, String content, User user, Article article, Long rootId, Long parentId) {
         this.writer = writer;
         this.content = content;

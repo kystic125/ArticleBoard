@@ -55,7 +55,7 @@ public class UserService {
     }
 
     public Page<MyCommentDto> getMyComments(Long userId, Pageable pageable) {
-        return commentRepository.findByUser_UserId(userId, pageable)
+        return commentRepository.findMyComments(userId, pageable)
                 .map(MyCommentDto::from);
     }
 }

@@ -12,10 +12,12 @@ public class MyCommentDto {
 
     private final Long commentId;
     private final Long articleId;
+    private final String articleTitle;
     private final String content;
     private final String writer;
     private final Long rootId;
     private final Long parentId;
+    private final String parentWriter;
     private final LocalDateTime createdAt;
     private final Boolean isDeleted;
 
@@ -23,10 +25,12 @@ public class MyCommentDto {
         return new MyCommentDto(
                 comment.getCommentId(),
                 comment.getArticle().getArticleId(),
+                comment.getArticle().getTitle(),
                 comment.getContent(),
                 comment.getWriter(),
                 comment.getRootId(),
                 comment.getParentId(),
+                comment.getParent() != null ? comment.getParent().getWriter() : null,
                 comment.getCreatedAt(),
                 comment.getIsDeleted()
         );
