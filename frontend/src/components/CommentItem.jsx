@@ -69,7 +69,9 @@ export default function CommentItem({ comment, replies = [], writerMap = {}, onR
   if (comment.isDeleted) {
     return (
       <div id={`comment-${comment.commentId}`} ref={itemRef} style={styles.item}>
-        <p style={styles.deletedText}>삭제된 댓글입니다.</p>
+        <div style={highlighted ? styles.itemHighlighted : {}}>
+          <p style={styles.deletedText}>삭제된 댓글입니다.</p>
+        </div>
         {replies.map((reply) => (
           <CommentItem key={reply.commentId} comment={reply} replies={[]} writerMap={writerMap} onRefresh={onRefresh} />
         ))}
@@ -78,63 +80,61 @@ export default function CommentItem({ comment, replies = [], writerMap = {}, onR
   }
 
   return (
-    <div
-      id={`comment-${comment.commentId}`}
-      ref={itemRef}
-      style={{ ...styles.item, ...(highlighted ? styles.itemHighlighted : {}) }}
-    >
-      <div style={styles.header}>
-        <span style={styles.writer}>{comment.writer}</span>
-        <span style={styles.date}>{formatDate(comment.createdAt)}</span>
-        {isOwner && !editing && (
-          <div style={styles.actions}>
-            <button onClick={() => setEditing(true)} style={styles.actionBtn}>수정</button>
-            <button onClick={handleDelete} style={{ ...styles.actionBtn, color: '#e53935' }}>삭제</button>
+    <div id={`comment-${comment.commentId}`} ref={itemRef} style={styles.item}>
+      <div style={highlighted ? styles.itemHighlighted : {}}>
+        <div style={styles.header}>
+          <span style={styles.writer}>{comment.writer}</span>
+          <span style={styles.date}>{formatDate(comment.createdAt)}</span>
+          {isOwner && !editing && (
+            <div style={styles.actions}>
+              <button onClick={() => setEditing(true)} style={styles.actionBtn}>수정</button>
+              <button onClick={handleDelete} style={{ ...styles.actionBtn, color: '#e53935' }}>삭제</button>
+            </div>
+          )}
+        </div>
+
+        {editing ? (
+          <div style={styles.editArea}>
+            <textarea
+              value={editContent}
+              onChange={(e) => setEditContent(e.target.value)}
+              style={styles.textarea}
+              rows={3}
+              maxLength={150}
+            />
+            <div style={styles.editActions}>
+              <button onClick={() => setEditing(false)} style={styles.cancelBtn}>취소</button>
+              <button onClick={handleUpdate} style={styles.saveBtn}>저장</button>
+            </div>
           </div>
+        ) : (
+          <p
+            style={{ ...styles.content, ...(isAuthenticated ? styles.contentClickable : {}) }}
+            onClick={isAuthenticated && !editing ? () => setShowReplyForm((prev) => !prev) : undefined}
+          >
+            {replyTo && <span style={styles.replyTo}>@{replyTo} </span>}
+            {comment.content}
+          </p>
+        )}
+
+        {showReplyForm && (
+          <form onSubmit={handleReply} style={styles.replyForm}>
+            <textarea
+              value={replyContent}
+              onChange={(e) => setReplyContent(e.target.value)}
+              style={styles.textarea}
+              placeholder="답글을 입력하세요 (최대 150자)"
+              rows={2}
+              maxLength={150}
+              required
+            />
+            <div style={styles.replyFormActions}>
+              <button type="button" onClick={() => setShowReplyForm(false)} style={styles.cancelBtn}>취소</button>
+              <button type="submit" style={styles.saveBtn}>답글 등록</button>
+            </div>
+          </form>
         )}
       </div>
-
-      {editing ? (
-        <div style={styles.editArea}>
-          <textarea
-            value={editContent}
-            onChange={(e) => setEditContent(e.target.value)}
-            style={styles.textarea}
-            rows={3}
-            maxLength={150}
-          />
-          <div style={styles.editActions}>
-            <button onClick={() => setEditing(false)} style={styles.cancelBtn}>취소</button>
-            <button onClick={handleUpdate} style={styles.saveBtn}>저장</button>
-          </div>
-        </div>
-      ) : (
-        <p
-          style={{ ...styles.content, ...(isAuthenticated ? styles.contentClickable : {}) }}
-          onClick={isAuthenticated && !editing ? () => setShowReplyForm((prev) => !prev) : undefined}
-        >
-          {replyTo && <span style={styles.replyTo}>@{replyTo} </span>}
-          {comment.content}
-        </p>
-      )}
-
-      {showReplyForm && (
-        <form onSubmit={handleReply} style={styles.replyForm}>
-          <textarea
-            value={replyContent}
-            onChange={(e) => setReplyContent(e.target.value)}
-            style={styles.textarea}
-            placeholder="답글을 입력하세요 (최대 150자)"
-            rows={2}
-            maxLength={150}
-            required
-          />
-          <div style={styles.replyFormActions}>
-            <button type="button" onClick={() => setShowReplyForm(false)} style={styles.cancelBtn}>취소</button>
-            <button type="submit" style={styles.saveBtn}>답글 등록</button>
-          </div>
-        </form>
-      )}
 
       {replies.length > 0 && (
         <div style={styles.replies}>
