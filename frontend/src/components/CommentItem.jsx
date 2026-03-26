@@ -72,9 +72,13 @@ export default function CommentItem({ comment, replies = [], writerMap = {}, onR
         <div style={highlighted ? styles.itemHighlighted : {}}>
           <p style={styles.deletedText}>삭제된 댓글입니다.</p>
         </div>
-        {replies.map((reply) => (
-          <CommentItem key={reply.commentId} comment={reply} replies={[]} writerMap={writerMap} onRefresh={onRefresh} />
-        ))}
+        {replies.length > 0 && (
+          <div style={styles.replies}>
+            {replies.map((reply) => (
+              <CommentItem key={reply.commentId} comment={reply} replies={[]} writerMap={writerMap} onRefresh={onRefresh} />
+            ))}
+          </div>
+        )}
       </div>
     )
   }
