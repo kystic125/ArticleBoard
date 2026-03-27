@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 
 export default function ArticleCard({ article }) {
-  const { articleId, title, writer, createdAt, viewCount, likeCount, dislikeCount, isNotice, isPopular, isPopularBlocked } = article
+  const { articleId, title, writer, createdAt, viewCount, likeCount, dislikeCount, commentCount, isNotice, isPopular, isPopularBlocked } = article
 
   const formatDate = (dateStr) => {
     if (!dateStr) return ''
@@ -18,6 +18,7 @@ export default function ArticleCard({ article }) {
       <div style={styles.meta}>
         <span>{writer}</span>
         <span>{formatDate(createdAt)}</span>
+        <span>댓글 {commentCount}</span>
         <span>조회 {viewCount}</span>
         <span>👍 {likeCount}</span>
         <span>👎 {dislikeCount}</span>

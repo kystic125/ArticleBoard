@@ -34,6 +34,7 @@ public class CommentService {
         Article article = findArticle(articleId);
         Comment comment = commentRepository.save(Comment.createComment(dto.getContent(), article, user));
 
+        article.increaseCommentCount();
         eventPublisher.publishEvent(new CommentCreateEvent(
                 articleId,
                 article.getUser().getUserId(),
@@ -56,6 +57,7 @@ public class CommentService {
     @Transactional
     public void deleteComment(Long commentId, Long userId) {
         Comment comment = findComment(commentId);
+        Article article = comment.getArticle();
 
         if (comment.getRootId() == null) {
             if (commentRepository.existsByRootId(comment.getCommentId())) {
@@ -63,11 +65,14 @@ public class CommentService {
             } else {
                 hardDelete(comment, userId);
             }
+            article.decreaseCommentCount();
         } else {
             hardDelete(comment, userId);
+            article.decreaseCommentCount();
 
             Comment root = findComment(comment.getRootId());
-            if (root.getIsDeleted() && !commentRepository.existsByRootId(root.getCommentId())) {
+            if (root.getIsDeleted() &&
+                    !commentRepository.existsByRootId(root.getCommentId())) {
                 commentRepository.delete(root);
             }
         }
@@ -107,6 +112,7 @@ public class CommentService {
         Long parentAuthorId = target.getUser().getUserId();
         Long articleAuthorId = comment.getArticle().getUser().getUserId();
 
+        comment.getArticle().increaseCommentCount();
         eventPublisher.publishEvent(new CommentCreateEvent(
                 target.getArticle().getArticleId(),
                 articleAuthorId,

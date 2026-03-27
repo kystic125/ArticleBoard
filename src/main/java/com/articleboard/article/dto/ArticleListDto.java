@@ -15,6 +15,7 @@ public class ArticleListDto {
     private final Boolean isPopular;
     private final String title;
     private final String writer;
+    private final Long commentCount;
     private final LocalDateTime createdAt;
     private final Long viewCount;
     private final Long likeCount;
@@ -28,6 +29,7 @@ public class ArticleListDto {
                 article.getIsPopular(),
                 article.getTitle(),
                 article.getWriter(),
+                article.getCommentCount(),
                 article.getCreatedAt(),
                 article.getViewCount(),
                 article.getLikeCount(),

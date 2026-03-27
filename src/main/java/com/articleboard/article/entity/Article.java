@@ -152,4 +152,12 @@ public class Article {
             throw new CustomException(ErrorCode.POPULAR_ARTICLE_CANNOT_EDIT);
         }
     }
+
+    public void increaseCommentCount() {
+        this.commentCount += 1;
+    }
+
+    public void decreaseCommentCount() {
+        this.commentCount -= 1;
+    }
 }
